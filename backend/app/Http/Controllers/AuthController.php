@@ -12,6 +12,12 @@ class AuthController extends Controller
     protected AuthService $authService;
     protected UserService $userService;
 
+    /**
+     * コンストラクタ
+     *
+     * @param AuthService $authService
+     * @param UserService $userService
+     */
     public function __construct(AuthService $authService, UserService $userService)
     {
         $this->authService = $authService;
@@ -19,7 +25,10 @@ class AuthController extends Controller
     }
 
     /**
-     * ログイン
+     * ログイン処理
+     *
+     * @param Request $request
+     * @return JsonResponse
      */
     public function login(
         Request $request,
