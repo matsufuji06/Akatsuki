@@ -2,64 +2,50 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Auth;
 use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
+use App\Services\AuthService;
+use App\Services\UserService;
 
 class AuthController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    protected AuthService $authService;
+    protected UserService $userService;
+
+    public function __construct(AuthService $authService, UserService $userService)
     {
-        //
+        $this->authService = $authService;
+        $this->userService = $userService;
     }
 
     /**
-     * Show the form for creating a new resource.
+     * ログイン
      */
-    public function create()
+    public function login(
+        Request $request,
+    ): JsonResponse
     {
-        //
-    }
+        // バリデーション
+        $payload = $request->validate([
+            'email' => ['required', 'email'],
+            'password' => ['required', 'string'],
+        ]);
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
-    }
+        $user = $this->authService->attemptLogin($payload['email'], $payload['password']);
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Auth $auth)
-    {
-        //
-    }
+        if (!$user) {
+            return response()->json([
+                'message' => 'メールアドレスまたはパスワードが正しくありません。',
+            ], 401);
+        }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Auth $auth)
-    {
-        //
-    }
+        $plainToken = $this->authService->issueLoginToken($user);
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Auth $auth)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Auth $auth)
-    {
-        //
+        return response()->json([
+            'data' => [
+                'token' => $plainToken,
+                'user' => $this->userService->summarize($user),
+            ],
+        ]);
     }
 }
