@@ -24,10 +24,21 @@ class UserFactory extends Factory
      */
     public function definition(): array
     {
+        $joinedAt = fake()->dateTimeBetween('-2 years', 'now');
+        $currentStreak = fake()->numberBetween(0, 30);
+        $bestStreak = fake()->numberBetween($currentStreak, 90);
+        $totalCheckIns = fake()->numberBetween($bestStreak, 365);
+
         return [
             'name' => fake()->name(),
             'email' => fake()->unique()->safeEmail(),
             'email_verified_at' => now(),
+            'avatar_url' => fake()->imageUrl(256, 256, 'people', true),
+            'current_streak' => $currentStreak,
+            'best_streak' => $bestStreak,
+            'total_check_ins' => $totalCheckIns,
+            'level' => min(50, max(1, (int) ceil($totalCheckIns / 20))),
+            'joined_at' => $joinedAt,
             'password' => static::$password ??= Hash::make('password'),
             'remember_token' => Str::random(10),
         ];
