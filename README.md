@@ -133,7 +133,7 @@ docker compose exec backend php artisan <command>
 ## 7. 初回セットアップ（最短）
 
 ```bash
-cd /home/n-matsufuji/Akatsuki
+cd <project-root>
 docker compose up -d --build
 docker compose exec backend php artisan migrate:fresh --seed
 ```
