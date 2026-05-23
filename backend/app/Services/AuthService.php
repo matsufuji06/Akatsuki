@@ -22,7 +22,7 @@ class AuthService
 
         // まずメールアドレスでユーザーを1件取得する
         $user = User::query()
-            ->where('email', $normalizedEmail)
+            ->whereRaw('LOWER(email) = ?', [$normalizedEmail])
             ->first();
 
         // ユーザーがいない、またはパスワードが違うなら認証失敗として扱う
