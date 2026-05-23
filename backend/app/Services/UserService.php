@@ -9,12 +9,14 @@ class UserService
     /**
      * ユーザーの要約情報を取得
      *
+     * 認証後に返す前提のため、API利用に必要な最小限の情報だけに絞る。
+     *
      * @param User $user
      * @return array
      */
     public function summarize(User $user): array
     {
-        // joined_atがあればそれを、なければcreated_atを使用
+        // joined_at がある場合は入会日として優先し、なければ作成日を使う
         $joinedAt = $user->joined_at ?? $user->created_at;
 
         return [

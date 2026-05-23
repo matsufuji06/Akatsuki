@@ -34,22 +34,26 @@ class AuthController extends Controller
         Request $request,
     ): JsonResponse
     {
-        // バリデーション
+        // 入力値の形式を先に揃えて、認証処理に不正な値を渡さない
         $payload = $request->validate([
             'email' => ['required', 'email'],
             'password' => ['required', 'string'],
         ]);
 
+        // 認証判定はサービス層に寄せて、コントローラは入出力に集中させる
         $user = $this->authService->attemptLogin($payload['email'], $payload['password']);
 
         if (!$user) {
+            // 認証失敗時は理由をぼかして返し、情報を出しすぎない
             return response()->json([
                 'message' => 'メールアドレスまたはパスワードが正しくありません。',
             ], 401);
         }
 
+        // 既存トークンを整理してから、新しいログイントークンを払い出す
         $plainToken = $this->authService->issueLoginToken($user);
 
+        // フロントエンドがそのまま使える形で、トークンと表示用ユーザー情報を返す
         return response()->json([
             'data' => [
                 'token' => $plainToken,
