@@ -3,7 +3,7 @@ FROM php:8.3-cli
 RUN apt-get update \
     && apt-get install -y --no-install-recommends git unzip libzip-dev \
     && docker-php-ext-install pdo_mysql zip \
-    && pecl install xdebug \
+    && pecl install xdebug-3.3.2 \
     && docker-php-ext-enable xdebug \
     && rm -rf /var/lib/apt/lists/*
 
