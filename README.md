@@ -7,7 +7,7 @@
 Docker Compose のコマンドは、必ずプロジェクトのルートディレクトリで実行してください。
 
 ```bash
-cd /home/n-matsufuji/Akatsuki
+cd <project-root>
 ```
 
 理由:
