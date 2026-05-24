@@ -58,4 +58,26 @@ class LoginTest extends TestCase
             ->where('tokenable_id', $user->getKey())
             ->value('name'));
     }
+
+    public function test_login_returns_unauthorized_when_credentials_are_invalid(): void
+    {
+        $user = User::factory()->create([
+            'password' => 'password',
+        ]);
+
+        $response = $this->postJson('/api/v1/auth/login', [
+            'email' => $user->email,
+            'password' => 'wrong-password',
+        ]);
+
+        $response->assertUnauthorized();
+        $response->assertExactJson([
+            'message' => 'メールアドレスまたはパスワードが正しくありません。',
+        ]);
+
+        $this->assertSame(0, DB::table('personal_access_tokens')
+            ->where('tokenable_type', User::class)
+            ->where('tokenable_id', $user->getKey())
+            ->count());
+    }
 }
