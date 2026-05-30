@@ -12,8 +12,6 @@ class AuthService
      *
      * メールアドレスを正規化したうえでユーザーを探し、
      * パスワード確認まで通った場合のみユーザーを返す。
-     *
-     * @return User|null
      */
     public function attemptLogin(string $email, string $password): ?User
     {
@@ -22,11 +20,11 @@ class AuthService
 
         // まずメールアドレスでユーザーを1件取得する
         $user = User::query()
-            ->whereRaw('LOWER(email) = ?', [$normalizedEmail])
+            ->where('email', $normalizedEmail)
             ->first();
 
         // ユーザーがいない、またはパスワードが違うなら認証失敗として扱う
-        if (!$user || !Hash::check($password, $user->password)) {
+        if (! $user || ! Hash::check($password, $user->password)) {
             return null;
         }
 
@@ -37,11 +35,6 @@ class AuthService
      * ログイントークン発行
      *
      * 同名トークンを先に消しておくことで、再ログイン時にトークンが増え続けるのを防ぐ。
-     *
-     * @param User $user
-     * @param string $tokenName
-     * @param int $expiresDays
-     * @return string
      */
     public function issueLoginToken(User $user, string $tokenName = 'apiToken', int $expiresDays = 7): string
     {
