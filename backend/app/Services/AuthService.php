@@ -8,6 +8,21 @@ use Illuminate\Support\Facades\Hash;
 class AuthService
 {
     /**
+     * 新規ユーザー登録
+     *
+     * メールアドレスは正規化したうえで保存し、joined_at を設定する。
+     */
+    public function registerUser(string $name, string $email, string $password): User
+    {
+        return User::query()->create([
+            'name' => trim($name),
+            'email' => strtolower(trim($email)),
+            'password' => $password,
+            'joined_at' => now(),
+        ]);
+    }
+
+    /**
      * ログイン試行
      *
      * メールアドレスを正規化したうえでユーザーを探し、
