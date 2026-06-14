@@ -34,6 +34,12 @@ class AuthController extends Controller
         Request $request,
     ): JsonResponse
     {
+        // バリデーション前に正規化して、unique 判定/required 判定と保存値の前提を揃える
+        $request->merge([
+            'name' => trim((string) $request->input('name')),
+            'email' => strtolower(trim((string) $request->input('email'))),
+        ]);
+
         // 登録に必要な項目のみを受け付け、重複メールや弱いパスワードを弾く
         $payload = $request->validate([
             'name' => ['required', 'string', 'max:255'],
