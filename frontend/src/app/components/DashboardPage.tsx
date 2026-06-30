@@ -62,9 +62,24 @@ export function DashboardPage() {
 
       <section className="card">
         <p>週の目標達成率</p>
-        <div className="bar" role="progressbar" aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round((data.summary.weeklyProgress / data.summary.weeklyTarget) * 100)}>
-          <span style={{ width: `${(data.summary.weeklyProgress / data.summary.weeklyTarget) * 100}%` }} />
-        </div>
+        {(() => {
+          const percent =
+            data.summary.weeklyTarget > 0
+              ? Math.min(100, (data.summary.weeklyProgress / data.summary.weeklyTarget) * 100)
+              : 0
+
+          return (
+            <div
+              className="bar"
+              role="progressbar"
+              aria-valuemin={0}
+              aria-valuemax={100}
+              aria-valuenow={Math.round(percent)}
+            >
+              <span style={{ width: `${percent}%` }} />
+            </div>
+          )
+        })()}
         <p style={{ marginTop: '0.4rem' }}>
           {data.summary.weeklyProgress} / {data.summary.weeklyTarget} 日
         </p>
