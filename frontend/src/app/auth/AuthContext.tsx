@@ -75,7 +75,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   const value = useMemo<AuthState>(
     () => ({
-      isAuthenticated: token !== null,
+      isAuthenticated: token !== null && user !== null,
       isBootstrapping: false,
       user,
       token,
