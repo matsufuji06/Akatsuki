@@ -7,6 +7,8 @@ import { useAuth } from '../auth/useAuth'
 type LocationState = {
   from?: {
     pathname?: string
+    search?: string
+    hash?: string
   }
 }
 
@@ -21,7 +23,10 @@ export function RegisterPage() {
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
 
-  const from = (location.state as LocationState | null)?.from?.pathname ?? '/'
+  const fromLocation = (location.state as LocationState | null)?.from
+  const from = fromLocation
+    ? `${fromLocation.pathname ?? '/'}${fromLocation.search ?? ''}${fromLocation.hash ?? ''}`
+    : '/'
 
   if (isAuthenticated) {
     return <Navigate to={from} replace />
