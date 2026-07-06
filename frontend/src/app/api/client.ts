@@ -9,8 +9,9 @@ import type {
 } from '../types'
 
 const API_BASE_URL =
+  getRuntimeApiBaseUrl() ??
   (import.meta.env.VITE_API_BASE_URL as string | undefined)?.replace(/\/$/, '') ??
-  'http://127.0.0.1:8000/api/v1'
+  (import.meta.env.PROD ? '/api/v1' : 'http://127.0.0.1:8000/api/v1')
 
 const AUTH_TOKEN_STORAGE_KEY = 'akatsukiAuthToken'
 const AUTH_USER_STORAGE_KEY = 'akatsukiAuthUser'
@@ -22,6 +23,25 @@ type ApiErrorResponse = {
 
 type RequestOptions = {
   token?: string | null
+}
+
+type RuntimeAppConfig = {
+  apiBaseUrl?: string
+}
+
+function getRuntimeApiBaseUrl(): string | undefined {
+  if (typeof window === 'undefined') {
+    return undefined
+  }
+
+  const config = (window as Window & { __APP_CONFIG__?: RuntimeAppConfig }).__APP_CONFIG__
+
+  if (typeof config?.apiBaseUrl !== 'string') {
+    return undefined
+  }
+
+  const value = config.apiBaseUrl.trim()
+  return value.length > 0 ? value.replace(/\/$/, '') : undefined
 }
 
 class ApiError extends Error {
