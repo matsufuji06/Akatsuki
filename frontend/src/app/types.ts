@@ -19,12 +19,28 @@ export type DashboardData = {
   user: ApiUser
   checkedInToday: boolean
   canCheckInNow: boolean
+  todayCheckIn: CheckInData | null
   summary: {
     todayActivity: string
     todayDuration: number
     weeklyTarget: number
     weeklyProgress: number
   }
+}
+
+export type CheckInData = {
+  id: string
+  activity: string
+  durationMinutes: number
+  note: string | null
+  checkedInOn: string
+  checkedInAt: string
+}
+
+export type CreateCheckInPayload = {
+  activity: string
+  durationMinutes: number
+  note?: string
 }
 
 export type LeaderboardMember = {

@@ -1,8 +1,9 @@
 <?php
 
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\CheckInController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\AuthController;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -17,4 +18,10 @@ Route::prefix('v1')->group(function () {
     // ログインは公開APIとして提供し、ここでアクセストークンを発行する
     Route::post('/auth/login', [AuthController::class, 'login'])
         ->middleware('throttle:5,1');
+
+    Route::middleware('auth:sanctum')->group(function () {
+        Route::get('/dashboard', [CheckInController::class, 'dashboard']);
+        Route::post('/check-ins', [CheckInController::class, 'store'])
+            ->middleware('throttle:10,1');
+    });
 });

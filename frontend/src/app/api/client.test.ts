@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { clearStoredAuthToken, login } from './client'
+import { clearStoredAuthToken, createCheckIn, fetchDashboard, login } from './client'
 
 describe('api client', () => {
   beforeEach(() => {
@@ -54,5 +54,61 @@ describe('api client', () => {
     )
 
     clearStoredAuthToken()
+  })
+
+  it('fetches the authenticated dashboard', async () => {
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({
+        data: {
+          user: {},
+          checkedInToday: false,
+          canCheckInNow: true,
+          todayCheckIn: null,
+          summary: {
+            todayActivity: '未チェックイン',
+            todayDuration: 0,
+            weeklyTarget: 7,
+            weeklyProgress: 0,
+          },
+        },
+      }),
+    })
+    vi.stubGlobal('fetch', fetchMock)
+
+    await fetchDashboard('test-token')
+
+    const request = fetchMock.mock.calls[0]
+    expect(request?.[0]).toBe('http://127.0.0.1:8000/api/v1/dashboard')
+    expect((request?.[1]?.headers as Headers).get('Authorization')).toBe('Bearer test-token')
+  })
+
+  it('posts a check-in using the API field names', async () => {
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({
+        data: {
+          checkIn: {},
+          dashboard: {},
+        },
+      }),
+    })
+    vi.stubGlobal('fetch', fetchMock)
+
+    await createCheckIn('test-token', {
+      activity: '読書',
+      durationMinutes: 30,
+      note: '1章読んだ',
+    })
+
+    const request = fetchMock.mock.calls[0]
+    expect(request?.[0]).toBe('http://127.0.0.1:8000/api/v1/check-ins')
+    expect(request?.[1]?.method).toBe('POST')
+    expect(JSON.parse(request?.[1]?.body as string)).toEqual({
+      activity: '読書',
+      duration_minutes: 30,
+      note: '1章読んだ',
+    })
+    expect((request?.[1]?.headers as Headers).get('Authorization')).toBe('Bearer test-token')
   })
 })

@@ -30,6 +30,7 @@ type AuthState = {
     password_confirmation: string
   }) => Promise<void>
   logout: () => void
+  updateUser: (user: ApiUser) => void
 }
 
 const AuthContext = createContext<AuthState | undefined>(undefined)
@@ -73,6 +74,11 @@ export function AuthProvider({ children }: AuthProviderProps) {
     setUser(null)
   }, [])
 
+  const updateUser = useCallback((nextUser: ApiUser) => {
+    setStoredUser(nextUser)
+    setUser(nextUser)
+  }, [])
+
   const value = useMemo<AuthState>(
     () => ({
       isAuthenticated: token !== null && user !== null,
@@ -82,8 +88,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
       login,
       register,
       logout,
+      updateUser,
     }),
-    [login, logout, register, token, user],
+    [login, logout, register, token, updateUser, user],
   )
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>

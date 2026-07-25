@@ -2,6 +2,8 @@ import type {
   AchievementData,
   ApiEnvelope,
   ApiUser,
+  CheckInData,
+  CreateCheckInPayload,
   DashboardData,
   LeaderboardMember,
   ProfileData,
@@ -135,18 +137,30 @@ export function logout(): void {
   clearStoredUser()
 }
 
-export async function fetchDashboard(user: ApiUser): Promise<DashboardData> {
-  return {
-    user,
-    checkedInToday: user.streak > 0,
-    canCheckInNow: true,
-    summary: {
-      todayActivity: '読書',
-      todayDuration: 30,
-      weeklyTarget: 7,
-      weeklyProgress: Math.min(user.streak, 7),
+export async function fetchDashboard(token: string): Promise<DashboardData> {
+  const response = await request<DashboardData>('/dashboard', undefined, { token })
+
+  return response.data
+}
+
+export async function createCheckIn(
+  token: string,
+  payload: CreateCheckInPayload,
+): Promise<{ checkIn: CheckInData; dashboard: DashboardData }> {
+  const response = await request<{ checkIn: CheckInData; dashboard: DashboardData }>(
+    '/check-ins',
+    {
+      method: 'POST',
+      body: JSON.stringify({
+        activity: payload.activity,
+        duration_minutes: payload.durationMinutes,
+        note: payload.note || null,
+      }),
     },
-  }
+    { token },
+  )
+
+  return response.data
 }
 
 export async function fetchLeaderboard(): Promise<LeaderboardMember[]> {
