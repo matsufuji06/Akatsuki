@@ -100,7 +100,29 @@ frontend コンテナにシェルで入る:
 docker compose exec frontend sh
 ```
 
-## 5. Database コマンド
+## 5. テスト実行コマンド
+
+テストは、プロジェクトルートから各コンテナ内で実行します。
+
+Backend（Laravel / PHPUnit）:
+
+```bash
+docker compose exec backend php artisan test
+```
+
+Frontend（Vitest）:
+
+```bash
+docker compose exec frontend npm run test
+```
+
+Frontend（Vitest・ウォッチモード）:
+
+```bash
+docker compose exec frontend npm run test:watch
+```
+
+## 6. Database コマンド
 
 コンテナ内の MySQL に接続:
 
@@ -120,7 +142,7 @@ docker compose exec db sh -lc 'mysqldump -uakatsuki -pakatsuki akatsuki' > backu
 cat backup.sql | docker compose exec -T db sh -lc 'mysql -uakatsuki -pakatsuki akatsuki'
 ```
 
-## 6. 重要メモ（よくあるエラー）
+## 7. 重要メモ（よくあるエラー）
 
 ホストマシンで php artisan を実行すると、次のエラーが出る場合があります。
 
@@ -134,7 +156,7 @@ cat backup.sql | docker compose exec -T db sh -lc 'mysql -uakatsuki -pakatsuki a
 docker compose exec backend php artisan <command>
 ```
 
-## 7. 初回セットアップ（最短）
+## 8. 初回セットアップ（最短）
 
 ```bash
 cd <project-root>
